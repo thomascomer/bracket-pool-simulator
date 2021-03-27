@@ -188,7 +188,7 @@ def initialize_teams(day=0, hour=0) -> dict:
 		game_day2 = int(game_day)
 		update_kp()
 		do_continue = None
-		while do_continue is None and game_day2 < 40:
+		while do_continue is None or game_day2 < 40:
 			try:
 				f2 = open("corefolder/kp" + str(game_day2) + ".txt")
 				print("kp ratings from the " + game_day[:-1] + "th not found, using ratings from the " + str(game_day2) + "th")
@@ -196,7 +196,7 @@ def initialize_teams(day=0, hour=0) -> dict:
 				break
 			except FileNotFoundError:
 				game_day2 += 1
-				if game_day2 > 40:
+				if game_day2 == 40:
 					game_day2 = 11
 					do_continue = 1
 	if f2 is None:
