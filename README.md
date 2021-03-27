@@ -18,6 +18,6 @@ update_scoreboard() should be called when games are completed to include the res
 
 FILES
 
-scoreboard.txt can be doctored to consider different possible outcomes. A team is guaranteed at least as many wins as its name appears on a line to be included by main(). Whether a line is included is determined by day and hour.
+scoreboard.txt can be doctored to consider different possible outcomes. A team is guaranteed at least as many wins as times its name appears on a line to be included by main(). Whether a line is included is determined by day and hour.
 
 the results/ folder contains the results of main() if be_quick was set under a groupID folder, and the results of kp_sim(), both according to time.
