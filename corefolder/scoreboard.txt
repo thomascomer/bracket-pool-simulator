@@ -1,0 +1,30 @@
+d0h12:Arkansas,Florida,19
+d0h13:Illinois,Texas Tech,19
+d0h15:Baylor,Oral Roberts,19
+d0h16:Loyola (IL),Oregon State,19
+d0h18:Oklahoma State,19
+d0h19:Houston,Wisconsin,North Texas,19
+d0h21:Syracuse,Rutgers,19
+d0h22:West Virginia,Villanova,19
+d1h12:Colorado,Florida State,20
+d1h13:LSU,Kansas,20
+d1h15:Michigan,Creighton,20
+d1h16:Alabama,USC,20
+d1h18:Iowa,20
+d1h19:Maryland,Oklahoma,Ohio,20
+d1h21:UCLA,Gonzaga,Oregon,20
+d1h22:Abilene Christian,20
+d2h12:Loyola (IL),21
+d2h14:Baylor,21
+d2h17:Syracuse,21
+d2h18:Arkansas,21
+d2h19:Houston,Oral Roberts,21
+d2h20:Villanova,21
+d2h21:Oregon State,21
+d3h12:Oregon,22
+d3h14:Gonzaga,22
+d3h17:UCLA,22
+d3h18:Creighton,22
+d3h19:Michigan,Florida State,22
+d3h20:Alabama,22
+d3h21:USC,22
