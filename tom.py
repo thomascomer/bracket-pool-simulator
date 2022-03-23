@@ -7,10 +7,10 @@ import numpy as np
 import os
 from splinter import browser
 
-class Team:  # e.g. Valparaiso
+class Team:
 	def __init__(self, ID, name, seed):
-		self.ID = ID  # ID according to ESPN
-		self.name = name  # team name
+		self.ID = ID
+		self.name = name
 		self.seed = int(seed)
 		self.eliminated = False
 		self.wins = 0  # number of wins in current sim
@@ -36,7 +36,7 @@ class Team:  # e.g. Valparaiso
 		self.wins = 0
 
 
-class Entry:  # e.g. The Egg McMuffin of Brackets
+class Entry:
 	def __init__(self, filename: str):
 		self.name = filename.split('/')[-1]
 		self.scores_array = np.zeros(0, np.uint8)
@@ -68,9 +68,11 @@ class Entry:  # e.g. The Egg McMuffin of Brackets
 					self.champ = pick
 
 
-class Pool:  # e.g. MG Bracket Pool 2016
-	def __init__(self, groupID: str, year=2021):
+class Pool:
+	def __init__(self, groupID: str, year=2022):
+		self.drawcount = 0
 		self.winning_scores = None
+		self.games_completed = 0
 		self.entries = {}
 		while self.entries == {}:
 			for filename in glob.glob("html_sources/" + groupID + "/*"):
@@ -84,13 +86,15 @@ class Pool:  # e.g. MG Bracket Pool 2016
 			entry = self.entries[entryname]
 			if self.winning_scores is None:
 				self.winning_scores = entry.scores_array.copy()
+			else:
+				self.drawcount += 1
 			self.winning_scores = np.maximum(self.winning_scores, entry.scores_array)
 
 
 def update_scoreboard():  # day is the number of days completed, hour is the latest tipoff to be included on the incomplete day
 	f1 = None
 	with browser.Browser(headless=True) as b:
-		b.visit("https://www.sports-reference.com/cbb/postseason/2021-ncaa.html")
+		b.visit("https://www.sports-reference.com/cbb/postseason/2022-ncaa.html")
 		scoreboard_html = b.html_snapshot()
 		f1 = open(scoreboard_html)
 	all_text = f1.read()
@@ -106,12 +110,8 @@ def update_scoreboard():  # day is the number of days completed, hour is the lat
 			winners[str(game_day) + game_hour] += "," + winner
 		except KeyError:
 			winners[str(game_day) + game_hour] = winner
-	try:
-		winners["2021"] += ",Oregon"
-	except KeyError:
-		winners["2021"] = "Oregon"
 	f1.close()
-	with open("corefolder/scoreboard.txt", 'w') as f2:
+	with open("corefolder/scoreboard2022.txt", 'w') as f2:
 		day = -1
 		last_date = 0
 		for winner in sorted(winners):
@@ -123,7 +123,7 @@ def update_scoreboard():  # day is the number of days completed, hour is the lat
 			f2.write("d" + str(day) + "h" + hour + ":" + winners[winner] + ',' + str(date) + '\n')
 
 
-def update_kp():  # not perfect
+def update_kp():
 	f1 = None
 	f2 = None
 	with browser.Browser(headless=True) as b:
@@ -148,26 +148,27 @@ def update_kp():  # not perfect
 
 
 def initialize_teams(day=0, hour=0) -> dict:
+	game_day = '17' #first day of games
 	teams = {}
+	year = "2022"
 	# get neam, seed, and ID
-	with open("corefolder/national_bracket2021.html") as f1:  # this file is the "National Bracket" courtesy of espn.com and is used to initialize teams within the program
+	with open("corefolder/national_bracket" + year + ".html") as f1:  # this file is the "National Bracket" from espn.com and is used to initialize teams within the program
 		for line in f1.readlines():
 			if "scoreboard_teams" in line:
 				for team in re.findall(r"{.*?\}", line):
 					name = re.search(r"\"n\":\".*?\"", team)[0][5:-1]
 					seed = re.search(r"\"s\":\d*?,", team)[0][4:-1]
-					ID = re.search(r"\"id\":\d*?,", team)[0][5:-1]  # we don't use this
+					ID = re.search(r"\"id\":\d*?,", team)[0][5:-1]
 					teams[name] = Team(ID, name, seed)
 				break
 
 	# look up how many games team has won
-	game_day = 0
 	f = None
 	try:
-		f = open("corefolder/scoreboard.txt")
+		f = open("corefolder/scoreboard2022.txt")
 	except FileNotFoundError:
 		update_scoreboard()
-		f = open("corefolder/scoreboard.txt")
+		f = open("corefolder/scoreboard2022.txt")
 	if f is None:
 		raise FileNotFoundError("scoreboard not found")
 	for line in f.readlines():
@@ -188,16 +189,20 @@ def initialize_teams(day=0, hour=0) -> dict:
 		game_day2 = int(game_day)
 		update_kp()
 		do_continue = None
-		while do_continue is None or game_day2 < 40:
+		while do_continue is None or game_day2 > 10:
 			try:
 				f2 = open("corefolder/kp" + str(game_day2) + ".txt")
-				print("kp ratings from the " + game_day[:-1] + "th not found, using ratings from the " + str(game_day2) + "th")
-				print("to prevent the program from visiting kenpom.com every time you see this error, create and populate file " + "corefolder/kp" + game_day[:-1] + ".txt\na copy of another kp file will work fine")
+				if game_day2 != int(game_day):
+					print("kp ratings from the " + game_day[:-1] + "th not found, using ratings from the " + str(game_day2) + "th")
+					print("to prevent the program from visiting kenpom.com every time you see this error, create and populate file " + "corefolder/kp" + game_day[:-1] + ".txt\na copy of another kp file will work fine")
 				break
 			except FileNotFoundError:
-				game_day2 += 1
-				if game_day2 == 40:
-					game_day2 = 11
+				if do_continue:
+					game_day2 -= 1
+				else:
+					game_day2 += 1
+				if game_day2 == 44:
+					game_day2 = int(game_day) - 1
 					do_continue = 1
 	if f2 is None:
 		raise FileNotFoundError("kp ratings not found")
@@ -217,7 +222,7 @@ def initialize_teams(day=0, hour=0) -> dict:
 	return teams
 
 
-def map_name(team: str, year=2021) -> str:
+def map_name(team: str, year=2022) -> str:
 	with open("corefolder/name_mapping" + str(year) + ".txt") as f:
 		for line in f.readlines():
 			if team in line.split(','):
@@ -226,8 +231,7 @@ def map_name(team: str, year=2021) -> str:
 
 
 
-def simulate(teams: dict, sim_count: int, day=0, hour=0):  # ~19 seconds for 100000 kp sims
-	# This should be the only function whose code needs changed when day is implemented
+def simulate(teams: dict, sim_count: int, day=0, hour=0):  # ~19 seconds for 100000 sims
 	filename = "simsdata/"
 	filename += "sim_d" + str(day) + 'h' + str(hour) + ".data"
 	opp = None
@@ -331,7 +335,7 @@ def score(mypool: Pool, teams: dict, sim_count: int, day=0, hour=0, refresh_sim=
 		score(mypool, teams, sim_count, day, hour)
 
 
-def print_output(mypool: Pool, groupID=0, be_quick=True, day=0, hour=0, print_average=False, print_champ=True):
+def print_output(mypool: Pool, groupID=0, be_quick=True, day=0, hour=0, print_average=False, print_champ=True, winner_only=False):
 	mypool.determine_winscores()
 	f = None
 	params_id = print_average + 2 * print_champ
@@ -345,6 +349,23 @@ def print_output(mypool: Pool, groupID=0, be_quick=True, day=0, hour=0, print_av
 				pass
 			os.mkdir("results/" + str(groupID))
 			f = open("results/" + str(groupID) + "/" + "d" + str(day) + 'h' + str(hour) + '_' + str(params_id) + ".txt", "w")
+	sim_idx = 0
+	for winscore in mypool.winning_scores:
+		winner_list = []
+		for entryname in mypool.entries:
+			entry = mypool.entries[entryname]
+			if entry.scores_array[sim_idx] == winscore:
+				winner_list.append(entry)
+		for winner in winner_list:
+			winner.winnings += len(mypool.entries) / len(winner_list)
+		sim_idx += 1
+	for winner in winner_list:
+		if winner_only and winner.winnings == len(mypool.entries) * len(mypool.winning_scores):
+			print("\nwinner:", winner.name, end='')
+			return
+	print('\n')
+	if be_quick:
+		f.write('\n')
 	if print_champ:
 		print("CHAMP       ", end='')
 		if be_quick:
@@ -356,16 +377,6 @@ def print_output(mypool: Pool, groupID=0, be_quick=True, day=0, hour=0, print_av
 	print("WINRATE\tENTRY", end='')
 	if be_quick:
 		f.write("WINRATE\tENTRY")
-	sim_idx = 0
-	for winscore in mypool.winning_scores:
-		winner_list = []
-		for entryname in mypool.entries:  # TODO: only place with a bad nested for
-			entry = mypool.entries[entryname]
-			if entry.scores_array[sim_idx] == winscore:
-				winner_list.append(entry)
-		for winner in winner_list:
-			winner.winnings += len(mypool.entries) / len(winner_list)
-		sim_idx += 1
 	order = {}
 	entry_idx = 0
 	for entryname in mypool.entries:
@@ -381,26 +392,31 @@ def print_output(mypool: Pool, groupID=0, be_quick=True, day=0, hour=0, print_av
 			if be_quick:
 				f.write("\nerror reading picks from" + entry.name)
 		except KeyError:
-			print('\n', end='')
-			if be_quick:
-				f.write('\n')
-			if print_champ:
-				print(entry.champ + ' ' * (12 - len(entry.champ)), end='')
+			if (not winner_only) or entry.winrate != 0:
+				print('\n', end='')
 				if be_quick:
-					f.write(entry.champ + ' ' * (12 - len(entry.champ)))
-			if print_average:
-				print(f"{entry.average_score:.1f}\t", end='')
-				if be_quick:
-					f.write(f"{entry.average_score:.1f}\t")
-			if entry.winrate != 0:
-				print(f"{100 * entry.winrate / len(mypool.entries):.2f}" + "%\t" + entry.name, end='')
-			else:
-				print("0\t\t" + entry.name, end='')
-			if be_quick:
+					f.write('\n')
+				if print_champ:
+					print(entry.champ + ' ' * (12 - len(entry.champ)), end='')
+					if be_quick:
+						f.write(entry.champ + ' ' * (12 - len(entry.champ)))
+				if print_average:
+					print(f"{entry.average_score:.1f}\t", end='')
+					if be_quick:
+						f.write(f"{entry.average_score:.1f}\t")
 				if entry.winrate != 0:
-					f.write(f"{100 * entry.winrate / len(mypool.entries):.2f}" + "%\t" + entry.name)
+					print(f"{100 * entry.winrate / len(mypool.entries):.2f}" + "%\t" + entry.name, end='')
 				else:
-					f.write("0\t\t" + entry.name)
+					print("0\t\t" + entry.name, end='')
+				if be_quick:
+					if entry.winrate != 0:
+						f.write(f"{100 * entry.winrate / len(mypool.entries):.2f}" + "%\t" + entry.name)
+					else:
+						f.write("0\t\t" + entry.name)
+			else:
+				print("\neliminated: "+ entry.name, end='')
+				if be_quick:
+					f.write("\neliminated: " + entry.name)
 	if be_quick:
 		f.close()
 
@@ -415,21 +431,27 @@ def quick_output(groupID: int, day=0, hour=0, print_average=False, print_champ=T
 		return False
 
 
-def main(day, hour=0):
+def main(day, hour=0, groupID):
 	# PARAMETERS
 	sim_count = 100000
-	groupID = 3702984
 	be_quick = True  # attempt to store and look up results
 	refresh_sim = False  # may have no effect if be_quick is True
+	'''	refresh_sim makes simsdata/sim_d{day}h{hour}.data refresh. Otherwise the results
+		will be the same each run even if be_quick is not set
+
+		be_quick prints results/{groupID}/d{day}h{hour}_{param_id}.txt if the file is present;
+		else writes the results to it. If it is not set the pool results are not saved.'''
 	print_average = True
 	print_champ = True
 
 	if be_quick and quick_output(groupID, day, hour, print_average=print_average, print_champ=print_champ):
 		return
-	mypool = Pool(str(groupID))
 	teams = initialize_teams(day, hour)
+
+	mypool = Pool(str(groupID))
 	score(mypool, teams, sim_count, day=day, hour=hour, refresh_sim=refresh_sim)  # .75 seconds for 100k sims
-	print_output(mypool, groupID, be_quick, day, hour, print_average=print_average, print_champ=print_champ)  # .45 seconds for 100k sims
+	print_output(mypool, groupID, be_quick, day, hour, print_average=print_average, print_champ=print_champ,
+				 winner_only=True)  # .45 seconds for 100k sims
 
 
 def kp_sim(day, hour=0):
@@ -462,7 +484,7 @@ def kp_sim(day, hour=0):
 	for teamwins in sorted(champ_count_order):
 		team = champ_count_order[teamwins]
 		print(team.name, ' ' * (16 - len(team.name)), team.total_wincounts[1:])
-		f2.write(team.name + ' ' * (17 - len(team.name)) + ' ' + str(team.total_wincounts[1:]) + '\n')
+		f2.write(str(team.seed) + ' ' + team.name + ' ' * (17 - len(team.name)) + ' ' + str(team.total_wincounts[1:]) + '\n')
 	f.close()
 	f2.close()
 
@@ -470,6 +492,10 @@ def kp_sim(day, hour=0):
 if __name__ == "__main__":
 	day = 4
 	hour = 0
-	main(day, hour)
-	kp_sim(day, hour)
 	# update_scoreboard()
+	main(day, hour, 4486414) #cognitive elite
+	main(day, hour, 4549837) #high rollers
+	kp_sim(day, hour) #this function has no effect on simsdata/ it will output
+						#a readable version of simsdata/ if present else will perform
+	 					#a sim without writing to simsdata/ and always writes
+						#its output to results/sim_results/d{day}h{hour}.txt
