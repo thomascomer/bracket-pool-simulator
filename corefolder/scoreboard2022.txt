@@ -1,0 +1,30 @@
+d0h12:Providence,Michigan,17
+d0h13:Memphis,17
+d0h14:Baylor,Tennessee,17
+d0h15:Richmond,17
+d0h16:UNC,Gonzaga,17
+d0h18:New Mexico State,17
+d0h19:Saint Mary's,St. Peter's,Creighton,17
+d0h21:UCLA,Murray State,Kansas,Arkansas,17
+d1h12:Auburn,Ohio State,18
+d1h13:Texas Tech,18
+d1h14:Purdue,Villanova,18
+d1h15:Miami (FL),18
+d1h16:Texas,Notre Dame,18
+d1h18:Illinois,18
+d1h19:Iowa State,Arizona,Duke,18
+d1h21:Wisconsin,TCU,Houston,Michigan State,18
+d2h12:UNC,19
+d2h14:Kansas,19
+d2h17:Michigan,19
+d2h18:Providence,19
+d2h19:UCLA,19
+d2h20:St. Peter's,Arkansas,19
+d2h21:Gonzaga,19
+d3h12:Houston,20
+d3h14:Villanova,20
+d3h17:Duke,20
+d3h18:Iowa State,20
+d3h19:Miami (FL),Texas Tech,20
+d3h20:Purdue,20
+d3h21:Arizona,20
