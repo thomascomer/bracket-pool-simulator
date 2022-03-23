@@ -3,9 +3,6 @@ import splinter
 import os
 import re
 
-# TODO refactor to find all entry IDs on group page (line ~20), then visit each page by hardcoding preceding str of url
-#   halve pages visited by not using b.back() for each entry
-#   reduce reliance on finicky .click()
 
 def getBfromP(groupID: str, path="html_sources/", year="2019", entry_limit=40):
     print("Connecting...", end=' ')
@@ -21,7 +18,7 @@ def getBfromP(groupID: str, path="html_sources/", year="2019", entry_limit=40):
             try:
                 re.search(r"<header class=\"group-header\">.*?</header>", group_text)[0][29:-9] + '/'
             except TypeError:
-                raise ValueError("This pool is not publicly accessible, therefore the program cannot run")  # TODO low: add manual entry functionality
+                raise ValueError("This pool is not publicly accessible, therefore the program cannot run")
         mylinks = []
         links = b.links.find_by_partial_href("entry?entryID=")
         for i, j in enumerate(links):
@@ -42,7 +39,7 @@ def getBfromP(groupID: str, path="html_sources/", year="2019", entry_limit=40):
                     urlBase = "http://fantasy.espn.com/tournament-challenge-bracket/" + str(year) + "/en/entry?"
                     b.visit(urlBase + ID)
                 notFound = False
-            except splinter.exceptions.ElementDoesNotExist:  # TODO: could try to navigate to profile and click the link from there
+            except splinter.exceptions.ElementDoesNotExist:
                 print('\n' + i, "could not be found")
                 notFound = True
             screenshot_path = b.html_snapshot()
