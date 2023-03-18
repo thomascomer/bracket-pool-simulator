@@ -1,3 +1,5 @@
+YEAR = 2023
+DATE_OF_FIRST_GAME = 16
 import random
 import re
 import glob
@@ -69,7 +71,7 @@ class Entry:
 
 
 class Pool:
-	def __init__(self, groupID: str, year=2022):
+	def __init__(self, groupID: str, year=YEAR):
 		self.drawcount = 0
 		self.winning_scores = None
 		self.games_completed = 0
@@ -94,7 +96,7 @@ class Pool:
 def update_scoreboard():  # day is the number of days completed, hour is the latest tipoff to be included on the incomplete day
 	f1 = None
 	with browser.Browser(headless=True) as b:
-		b.visit("https://www.sports-reference.com/cbb/postseason/2022-ncaa.html")
+		b.visit("https://www.sports-reference.com/cbb/postseason/" + str(YEAR) + "-ncaa.html")
 		scoreboard_html = b.html_snapshot()
 		f1 = open(scoreboard_html)
 	all_text = f1.read()
@@ -111,7 +113,7 @@ def update_scoreboard():  # day is the number of days completed, hour is the lat
 		except KeyError:
 			winners[str(game_day) + game_hour] = winner
 	f1.close()
-	with open("corefolder/scoreboard2022.txt", 'w') as f2:
+	with open("corefolder/scoreboard" + str(YEAR) + ".txt", 'w') as f2:
 		day = -1
 		last_date = 0
 		for winner in sorted(winners):
@@ -148,10 +150,10 @@ def update_kp():
 
 
 def initialize_teams(day=0, hour=0) -> dict:
-	game_day = '17' #first day of games
+	game_day = str(DATE_OF_FIRST_GAME) #first day of games
 	teams = {}
-	year = "2022"
-	# get neam, seed, and ID
+	year = str(YEAR)
+	# get name, seed, and ID
 	with open("corefolder/national_bracket" + year + ".html") as f1:  # this file is the "National Bracket" from espn.com and is used to initialize teams within the program
 		for line in f1.readlines():
 			if "scoreboard_teams" in line:
@@ -165,10 +167,10 @@ def initialize_teams(day=0, hour=0) -> dict:
 	# look up how many games team has won
 	f = None
 	try:
-		f = open("corefolder/scoreboard2022.txt")
+		f = open("corefolder/scoreboard" + str(YEAR) + ".txt")
 	except FileNotFoundError:
 		update_scoreboard()
-		f = open("corefolder/scoreboard2022.txt")
+		f = open("corefolder/scoreboard" + str(YEAR) + ".txt")
 	if f is None:
 		raise FileNotFoundError("scoreboard not found")
 	for line in f.readlines():
@@ -222,13 +224,13 @@ def initialize_teams(day=0, hour=0) -> dict:
 	return teams
 
 
-def map_name(team: str, year=2022) -> str:
+def map_name(team: str, year=YEAR) -> str:
+	team = team.replace('amp;', '').replace(';', '')
 	with open("corefolder/name_mapping" + str(year) + ".txt") as f:
 		for line in f.readlines():
 			if team in line.split(','):
 				return line.split(',')[0]
 	return team
-
 
 
 def simulate(teams: dict, sim_count: int, day=0, hour=0):  # ~19 seconds for 100000 sims
@@ -490,11 +492,11 @@ def kp_sim(day, hour=0):
 
 
 if __name__ == "__main__":
-	day = 4
+	day = 2
 	hour = 0
 	# update_scoreboard()
-	main(day, hour, 4486414) #cognitive elite
-	main(day, hour, 4549837) #high rollers
+	main(day, hour, 5313306) #ce
+	main(day, hour, 5724994) #high rollers
 	kp_sim(day, hour) #this function has no effect on simsdata/ it will output
 						#a readable version of simsdata/ if present else will perform
 	 					#a sim without writing to simsdata/ and always writes
