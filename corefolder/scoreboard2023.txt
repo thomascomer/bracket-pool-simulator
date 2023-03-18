@@ -1,0 +1,18 @@
+d0h12:Maryland,Furman,16
+d0h13:Missouri,16
+d0h14:Alabama,Kansas,16
+d0h15:San Diego State,16
+d0h16:Princeton,Arkansas,16
+d0h18:Auburn,16
+d0h19:Duke,Texas,Northwestern,16
+d0h21:Tennessee,Houston,Penn State,16
+d0h22:UCLA,16
+d1h12:Michigan State,Xavier,17
+d1h13:Baylor,17
+d1h14:Marquette,Saint Mary's,17
+d1h15:Pitt,17
+d1h16:Creighton,UConn,17
+d1h18:Fairleigh Dickinson,17
+d1h19:Kentucky,Miami (FL),Gonzaga,17
+d1h21:Florida Atlantic,Kansas State,Indiana,17
+d1h22:TCU,17
