@@ -433,7 +433,7 @@ def quick_output(groupID: int, day=0, hour=0, print_average=False, print_champ=T
 		return False
 
 
-def main(day, hour=0, groupID):
+def main(day, hour, groupID):
 	# PARAMETERS
 	sim_count = 100000
 	be_quick = True  # attempt to store and look up results
