@@ -10,7 +10,7 @@ def getBfromP(groupID: str, path="html_sources/", year="2019", entry_limit=40):
         if path == "html_sources/":
             path += groupID + '/'
         print("Connecting...", end=' ')
-        myurl = "http://fantasy.espn.com/tournament-challenge-bracket/" + str(year) + "/en/group?groupID=" + groupID + "&_301_=2022"
+        myurl = "http://fantasy.espn.com/tournament-challenge-bracket/" + str(year) + "/en/group?groupID=" + groupID + "&_301_=" + str(year)
         b.visit(myurl)
         group_html = b.html_snapshot()
         with open(group_html) as f:
