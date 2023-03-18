@@ -2,7 +2,7 @@
 
 SUMMARY: This project uses team ratings from KenPom.com to predict the winner of an NCAA Tournament bracket pool. It is a work in progress.
 
-INSTRUCTIONS: The program is set to run a simulation of the tournament current to the morning of March 24, show the results, and show the results of the Cognitive Elite pool. The program can be controlled by altering files and function parameters. It will take a few minutes to run any group the first time, depending on how many entries are in it. A new simulation takes about 30 seconds per 100,000 samples on my machine. The program runs in a few seconds when loading a previous simulation.
+INSTRUCTIONS: The program is set to run a simulation of the tournament current to the morning of March 18, show the results, and show the results of the Cognitive Elite pool. The program can be controlled by altering files and function parameters. It will take a few minutes to run any group the first time, depending on how many entries are in it. A new simulation takes about 30 seconds per 100,000 samples on my machine. The program runs in a few seconds when loading a previous simulation.
 
 -----------------------------------
 
